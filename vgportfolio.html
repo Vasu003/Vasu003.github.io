@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vasu Goti — Data Engineer & Cloud AI Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[data-theme="dark"]{
+  --bg:#080808;--bg2:#0f0f0f;--bg3:#161616;
+  --text:#f0ede6;--text2:rgba(240,237,230,0.55);--text3:rgba(240,237,230,0.25);
+  --accent:#00f5a0;--accent2:#0a84ff;
+  --border:rgba(240,237,230,0.1);--border2:rgba(240,237,230,0.06);
+  --card-bg:#111111;--card-hover:#161616;
+  --noise:0.04;--stat-bg:rgba(0,245,160,0.06);
+}
+[data-theme="light"]{
+  --bg:#f5f2ed;--bg2:#eae7e1;--bg3:#dedad3;
+  --text:#0d0d0d;--text2:rgba(13,13,13,0.55);--text3:rgba(13,13,13,0.28);
+  --accent:#007a50;--accent2:#005ec4;
+  --border:rgba(13,13,13,0.12);--border2:rgba(13,13,13,0.06);
+  --card-bg:#ffffff;--card-hover:#f0ece6;
+  --noise:0.025;--stat-bg:rgba(0,122,80,0.07);
+}
+html{scroll-behavior:auto}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.75;
+  cursor:none;overflow-x:hidden;
+  transition:background 0.5s,color 0.5s;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:var(--noise);
+}
+/* CURSOR */
+#cursor,#cring{position:fixed;border-radius:50%;pointer-events:none;z-index:10000;transform:translate(-50%,-50%)}
+#cursor{width:10px;height:10px;background:var(--accent);transition:width .3s,height .3s,background .3s,opacity .3s}
+#cring{width:34px;height:34px;border:1.5px solid var(--accent);opacity:.4;transition:width .4s,height .4s,border-color .3s,opacity .3s}
+#cursor.big{width:44px;height:44px;opacity:.12}
+#cring.big{width:60px;height:60px;opacity:.55}
+#cursor.blue{background:var(--accent2)}
+#cring.blue{border-color:var(--accent2)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border)}
+/* THEME TOGGLE */
+#tog{
+  position:fixed;bottom:28px;right:28px;z-index:1001;
+  width:50px;height:50px;border-radius:50%;
+  background:var(--card-bg);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:none;transition:all .3s;font-size:20px;
+}
+#tog:hover{border-color:var(--accent);transform:scale(1.08) rotate(12deg)}
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:26px 56px;
+  transition:background .4s,backdrop-filter .4s,padding .3s,border-color .4s;
+  border-bottom:1px solid transparent;
+}
+nav.scrolled{padding:14px 56px;border-bottom:1px solid var(--border);backdrop-filter:blur(24px)}
+[data-theme="dark"] nav.scrolled{background:rgba(8,8,8,.88)}
+[data-theme="light"] nav.scrolled{background:rgba(245,242,237,.9)}
+.nl{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--accent);text-decoration:none;letter-spacing:-.02em}
+.nls{display:flex;gap:36px;list-style:none}
+.nls a{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text2);text-decoration:none;position:relative;transition:color .3s;cursor:none}
+.nls a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1.5px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.nls a:hover{color:var(--text)}.nls a:hover::after{transform:scaleX(1)}
+.ham{display:none;flex-direction:column;gap:5px;cursor:none;background:none;border:none;padding:4px}
+.ham span{width:22px;height:1.5px;background:var(--text);display:block;transition:all .3s}
+.mob{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;gap:8px}
+.mob.open{opacity:1;pointer-events:all}
+.mob a{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-.03em;padding:8px 0;transition:color .3s;cursor:none}
+.mob a:hover{color:var(--accent)}
+.mbc{position:absolute;top:24px;right:32px;background:none;border:none;color:var(--text2);font-size:24px;cursor:none}
+.sbadge{position:fixed;top:26px;right:56px;z-index:1001;display:flex;align-items:center;gap:8px;background:var(--stat-bg);border:1px solid rgba(0,245,160,.18);border-radius:100px;padding:7px 16px;font-size:11px;font-family:'Syne',sans-serif;font-weight:600;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;transition:opacity .4s}
+[data-theme="light"] .sbadge{border-color:rgba(0,122,80,.25)}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pa 2s infinite;flex-shrink:0}
+@keyframes pa{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.6)}}
+/* LAYOUT */
+section{padding:140px 56px;max-width:1440px;margin:0 auto;position:relative}
+.fb{max-width:none;padding-left:0;padding-right:0}
+.si{max-width:1440px;margin:0 auto;padding:0 56px}
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:110px}
+.hkick{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:flex;align-items:center;gap:12px;opacity:0}
+.hkick::before{content:'';width:28px;height:1.5px;background:var(--accent);flex-shrink:0}
+.hh{font-family:'Syne',sans-serif;font-size:clamp(64px,11vw,180px);font-weight:800;letter-spacing:-.045em;line-height:.88}
+.hl{display:block;overflow:hidden;padding-bottom:.08em}
+.hl span{display:block;transform:translateY(110%);opacity:0}
+.hsub{margin-top:44px;max-width:500px;font-size:17px;color:var(--text2);line-height:1.85;font-style:italic;opacity:0;transform:translateY(20px)}
+.hcta{margin-top:44px;display:flex;gap:18px;align-items:center;opacity:0;transform:translateY(20px)}
+.bp{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:#080808;padding:15px 34px;border:none;border-radius:2px;text-decoration:none;cursor:none;transition:all .3s;display:inline-block}
+.bp:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,245,160,.3)}
+.bg{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text);border:1.5px solid var(--border);padding:14px 34px;border-radius:2px;text-decoration:none;cursor:none;transition:all .3s;display:inline-block}
+.bg:hover{border-color:var(--accent);color:var(--accent)}
+.hbot{position:absolute;bottom:44px;left:56px;right:56px;display:flex;justify-content:space-between;align-items:flex-end}
+.hloc{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:'Syne',sans-serif;opacity:0;transform:translateY(10px)}
+.scue{display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(10px)}
+.scue span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);font-family:'Syne',sans-serif}
+.sl{width:48px;height:1px;background:var(--text3);position:relative;overflow:hidden}
+.sl::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--accent);animation:ls 2s ease-in-out infinite}
+@keyframes ls{0%{left:-100%}100%{left:100%}}
+/* STATS */
+#stats{padding:0;max-width:none;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);transition:background .5s}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--border)}
+.sc{background:var(--bg2);padding:52px 40px;text-align:center;position:relative;overflow:hidden;transition:background .3s;cursor:default}
+.sc:hover{background:var(--card-hover)}
+.sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .4s}
+.sc:hover::after{opacity:1}
+.sn{font-family:'Syne',sans-serif;font-size:clamp(38px,5vw,70px);font-weight:800;letter-spacing:-.04em;color:var(--accent);display:block;line-height:1;margin-bottom:8px}
+.sl2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);font-family:'Syne',sans-serif;font-weight:500}
+/* ABOUT */
+.ag{display:grid;grid-template-columns:1fr 2fr;gap:96px;align-items:start}
+.alb{font-family:'Syne',sans-serif;font-size:clamp(72px,9vw,130px);font-weight:800;color:var(--border);line-height:1;letter-spacing:-.05em;margin-bottom:12px}
+.sh{font-family:'Syne',sans-serif;font-size:clamp(30px,4vw,58px);font-weight:800;letter-spacing:-.03em;line-height:1;margin-bottom:28px}
+.ab{font-size:17px;line-height:1.9;color:var(--text2);max-width:580px}
+.ab strong{color:var(--text);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:32px}
+.chip{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--border);border-radius:2px;padding:6px 14px;color:var(--text2);transition:all .3s;cursor:none}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--stat-bg)}
+/* MARQUEE */
+.mw{margin-top:80px;padding:22px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden}
+.mt{display:flex;white-space:nowrap;animation:mq 30s linear infinite}
+.mt:hover{animation-play-state:paused}
+.mi{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);padding:0 28px;flex-shrink:0;transition:color .3s}
+.mi.dot{color:var(--accent);padding:0 6px}
+.mi:not(.dot):hover{color:var(--text)}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+/* EXPERIENCE — TIMELINE */
+.tl{position:relative;margin-top:68px;padding-left:32px}
+.tl::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--accent),var(--border),transparent)}
+.ti{position:relative;margin-bottom:68px}
+.ti::before{content:'';position:absolute;left:-36px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--bg),0 0 0 5px var(--accent);transition:box-shadow .3s}
+.ti:hover::before{box-shadow:0 0 0 4px var(--bg),0 0 0 5px var(--accent),0 0 16px var(--accent)}
+.tp{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.tc{font-family:'Syne',sans-serif;font-size:clamp(18px,2.5vw,28px);font-weight:700;letter-spacing:-.02em;margin-bottom:4px}
+.tr{font-size:14px;color:var(--text2);margin-bottom:18px;font-style:italic}
+.tb{list-style:none;display:flex;flex-direction:column;gap:10px}
+.tb li{font-size:15px;color:var(--text2);line-height:1.7;padding-left:20px;position:relative}
+.tb li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-size:10px;top:5px}
+.tb li strong{color:var(--text);font-weight:500}
+/* PROJECTS */
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:68px}
+.pc{background:var(--card-bg);position:relative;overflow:hidden;cursor:none;transition:background .4s;display:flex;flex-direction:column}
+.pc:hover{background:var(--card-hover)}
+.pc.feat{grid-column:1/-1}
+.pv{width:100%;aspect-ratio:16/9;position:relative;overflow:hidden;background:var(--bg3);flex-shrink:0}
+.pv svg{width:100%;height:100%;transition:transform .6s cubic-bezier(.34,1.56,.64,1)}
+.pc:hover .pv svg{transform:scale(1.04)}
+.pvo{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,var(--card-bg));pointer-events:none;transition:background .4s}
+.pc:hover .pvo{background:linear-gradient(to bottom,transparent 40%,var(--card-hover))}
+.pb{padding:28px 32px 32px;flex:1;display:flex;flex-direction:column}
+.pnum{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.pn{font-family:'Syne',sans-serif;font-size:clamp(16px,1.8vw,24px);font-weight:700;letter-spacing:-.02em;margin-bottom:8px;transition:color .3s}
+.pc:hover .pn{color:var(--accent)}
+.pd{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px;flex:1}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.tag{font-size:10px;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--border2);border-radius:1px;padding:3px 9px;color:var(--text3);transition:all .3s}
+.pc:hover .tag{border-color:rgba(0,245,160,.2);color:var(--text2)}
+.pf{display:flex;justify-content:space-between;align-items:center;padding-top:18px;border-top:1px solid var(--border2)}
+.pm{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.04em}
+.pa{width:34px;height:34px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:14px;transition:all .3s}
+.pc:hover .pa{border-color:var(--accent);color:var(--accent);transform:translate(3px,-3px)}
+/* SKILLS */
+.skl{display:grid;grid-template-columns:1fr 2fr;gap:80px;margin-top:68px;align-items:start}
+.skd{font-size:16px;color:var(--text2);line-height:1.85;position:sticky;top:120px}
+.skr{display:flex;flex-direction:column}
+.skrow{display:grid;grid-template-columns:28px 1fr 48px;align-items:center;gap:20px;padding:18px 0;border-bottom:1px solid var(--border2);transform:translateX(-40px);opacity:0;transition:transform .6s ease,opacity .6s ease}
+.skrow.vis{transform:translateX(0);opacity:1}
+.skno{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--text3)}
+.skna{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;letter-spacing:-.01em;transition:color .3s}
+.skrow:hover .skna{color:var(--accent)}
+.skpct{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--text3);text-align:right;transition:color .3s}
+.skrow:hover .skpct{color:var(--accent)}
+.skbw{grid-column:2/4;height:1.5px;background:var(--border2);overflow:hidden;margin-top:-10px;margin-bottom:-2px}
+.skb{height:100%;background:var(--accent);width:0;transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+/* EDU */
+.eg{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:68px}
+.ec{background:var(--card-bg);padding:48px 44px;position:relative;overflow:hidden;transition:background .4s}
+.ec:hover{background:var(--card-hover)}
+.ec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:0;transition:opacity .4s}
+.ec:hover::before{opacity:1}
+.en{font-family:'Syne',sans-serif;font-size:72px;font-weight:800;color:var(--border2);line-height:1;letter-spacing:-.05em;margin-bottom:14px}
+.es{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.ed{font-size:13px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:600;letter-spacing:.06em;margin-bottom:18px}
+.em{font-size:13px;color:var(--text2);margin-bottom:14px}
+.eg2{display:inline-block;background:var(--stat-bg);border:1px solid var(--border);border-radius:2px;padding:4px 12px;font-size:11px;font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);letter-spacing:.06em;margin-bottom:18px}
+.ec2{font-size:13px;color:var(--text3);line-height:1.8}
+/* PITCH */
+#pitch{background:var(--bg2);border-top:1px solid var(--border);max-width:none;padding:120px 56px;transition:background .5s}
+.pi{max-width:1440px;margin:0 auto}
+.peyeb{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.pitchg{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:68px}
+.pcard{background:var(--bg3);padding:44px 40px;position:relative;overflow:hidden;transition:background .4s}
+.pcard:hover{background:var(--card-bg)}
+.pico{width:46px;height:46px;border-radius:4px;background:var(--stat-bg);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:22px}
+.pti{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px}
+.pbo{font-size:14px;color:var(--text2);line-height:1.8}
+.pac{color:var(--accent);font-weight:500}
+/* CONTACT */
+#contact{min-height:88vh;display:flex;flex-direction:column;justify-content:center}
+.cey{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;display:flex;align-items:center;gap:12px}
+.cey::before{content:'';width:26px;height:1.5px;background:var(--accent)}
+.ch{font-family:'Syne',sans-serif;font-size:clamp(48px,8.5vw,140px);font-weight:800;letter-spacing:-.045em;line-height:.88;margin-bottom:60px}
+.ch .acc{color:var(--accent)}
+.cem{display:inline-flex;align-items:center;gap:14px;border:1.5px solid var(--border);padding:18px 40px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:.01em;position:relative;overflow:hidden;transition:color .4s;cursor:none;margin-bottom:44px}
+.cem::before{content:'';position:absolute;inset:0;background:var(--accent);transform:translateX(-101%);transition:transform .5s cubic-bezier(.65,0,.35,1)}
+.cem:hover::before{transform:translateX(0)}.cem:hover{color:#080808;border-color:var(--accent)}
+.cem span,.cem .arr{position:relative;z-index:1}
+.cem .arr{transition:transform .3s}.cem:hover .arr{transform:translateX(6px)}
+.sr{display:flex;gap:0;align-items:center}
+.sla{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text2);text-decoration:none;padding:8px 22px;position:relative;transition:color .3s;cursor:none}
+.sla::after{content:'';position:absolute;bottom:0;left:22px;right:22px;height:1px;background:var(--accent);transform:scaleX(0);transition:transform .3s}
+.sla:hover{color:var(--text)}.sla:hover::after{transform:scaleX(1)}
+.ssep{color:var(--border);font-size:16px}
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:28px 56px;display:flex;justify-content:space-between;align-items:center;background:var(--bg2);transition:background .5s}
+.fc{font-size:12px;color:var(--text3);font-family:'Syne',sans-serif;letter-spacing:.06em}
+.fls{display:flex;gap:28px}
+.fls a{font-size:12px;color:var(--text3);text-decoration:none;font-family:'Syne',sans-serif;letter-spacing:.06em;transition:color .3s;cursor:none}
+.fls a:hover{color:var(--accent)}
+/* REVEAL */
+.rv{opacity:0;transform:translateY(48px);transition:opacity .9s ease,transform .9s cubic-bezier(.16,1,.3,1)}
+.rv.vis{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}
+/* RESPONSIVE */
+@media(max-width:1024px){
+  section{padding:100px 32px}.si{padding:0 32px}
+  nav{padding:18px 32px}nav.scrolled{padding:12px 32px}
+  .sbadge{right:32px;top:18px}.hbot{left:32px;right:32px}
+  .sg{grid-template-columns:repeat(2,1fr)}
+  .ag{grid-template-columns:1fr;gap:36px}
+  .pg{grid-template-columns:1fr}.pc.feat{grid-column:auto}
+  .skl{grid-template-columns:1fr;gap:36px}.skd{position:static}
+  .eg{grid-template-columns:1fr}
+  .pitchg{grid-template-columns:1fr}
+  #pitch{padding:80px 32px}footer{padding:22px 32px}
+}
+@media(max-width:768px){
+  .nls{display:none}.ham{display:flex}.sbadge{display:none}
+  section{padding:80px 24px}.si{padding:0 24px}
+  nav{padding:16px 24px}.hbot{left:24px;right:24px}
+  .sg{grid-template-columns:1fr 1fr}.sc{padding:28px 16px}
+  .pb{padding:20px 20px 24px}
+  .ec{padding:32px 24px}
+  .ch{font-size:clamp(40px,12vw,90px)}
+  #tog{bottom:18px;right:18px;width:44px;height:44px}
+}
+</style>
+</head>
+<body>
+<div id="cursor"></div><div id="cring"></div>
+
+<!-- THEME TOGGLE -->
+<button id="tog" aria-label="Toggle theme" title="Switch theme">
+  <span id="togIcon">☀️</span>
+</button>
+
+<!-- MOBILE MENU -->
+<div class="mob" id="mob">
+  <button class="mbc" id="mbc">✕</button>
+  <a href="#projects" onclick="cm()">Work</a>
+  <a href="#experience" onclick="cm()">Experience</a>
+  <a href="#skills" onclick="cm()">Skills</a>
+  <a href="#pitch" onclick="cm()">Why Me</a>
+  <a href="#contact" onclick="cm()">Contact</a>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nl">VG</a>
+  <ul class="nls">
+    <li><a href="#projects">Work</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#pitch">Why Me</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="ham" id="ham"><span></span><span></span></button>
+</nav>
+<div class="sbadge" id="sbadge"><span class="pulse"></span>Available for Work</div>
+
+<!-- HERO -->
+<section id="hero" class="fb"><div class="si">
+  <p class="hkick">Data Engineer · Houston, TX · MS Computer Science</p>
+  <h1 class="hh">
+    <span class="hl"><span>Vasu</span></span>
+    <span class="hl"><span style="color:var(--accent)">Data</span></span>
+    <span class="hl"><span>Engineer</span></span>
+  </h1>
+  <p class="hsub">Building scalable data pipelines, cloud infrastructure, and ML systems that turn raw data into decisions that actually matter.</p>
+  <div class="hcta"><a href="#projects" class="bp">View My Work</a><a href="#contact" class="bg">Let's Talk</a></div>
+</div>
+<div class="hbot">
+  <p class="hloc">Houston, TX &nbsp;·&nbsp; Open to Opportunities</p>
+  <div class="scue"><span>Scroll</span><div class="sl"></div></div>
+</div></section>
+
+<!-- STATS -->
+<section id="stats" class="fb"><div class="sg">
+  <div class="sc rv"><span class="sn" data-count="100" data-sfx="K+">0</span><span class="sl2">Records Processed Daily</span></div>
+  <div class="sc rv d1"><span class="sn" data-count="80" data-sfx="%">0</span><span class="sl2">Manual Work Eliminated</span></div>
+  <div class="sc rv d2"><span class="sn" data-count="87" data-sfx="%">0</span><span class="sl2">ML Model Accuracy</span></div>
+  <div class="sc rv" style="transition-delay:.3s"><span class="sn" data-count="5" data-sfx="+">0</span><span class="sl2">End-to-End Projects Shipped</span></div>
+</div></section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="ag">
+    <div class="rv"><div class="alb">02</div><h2 class="sh">About<br/>Me</h2></div>
+    <div class="rv d1">
+      <p class="ab">I'm a <strong>Data Engineer</strong> and MS Computer Science student at <strong>University of Houston</strong> (GPA 3.75), currently interning at <strong>Harris County Attorney's Office</strong> — where I turn 100,000+ legal case records into dashboards that decision-makers rely on every morning.</p>
+      <p class="ab" style="margin-top:18px">My superpower is building the <strong>full data chain</strong> — ingestion, transformation, modeling, visualization. Whether it's a star-schema warehouse on AWS, a Power BI drill-down, or an 87%-accurate churn model, I care about the pipeline <em>and</em> the impact.</p>
+      <div class="chips">
+        <span class="chip">Python</span><span class="chip">AWS</span><span class="chip">Power BI</span><span class="chip">SQL</span><span class="chip">SSIS</span><span class="chip">React.js</span><span class="chip">TensorFlow</span><span class="chip">Docker</span><span class="chip">PostgreSQL</span>
+      </div>
+    </div>
+  </div>
+  <div class="mw"><div class="mt">
+    <span class="mi">PYTHON</span><span class="mi dot">✦</span><span class="mi">AWS</span><span class="mi dot">✦</span><span class="mi">POWER BI</span><span class="mi dot">✦</span><span class="mi">SQL</span><span class="mi dot">✦</span><span class="mi">ETL PIPELINES</span><span class="mi dot">✦</span><span class="mi">MACHINE LEARNING</span><span class="mi dot">✦</span><span class="mi">POSTGRESQL</span><span class="mi dot">✦</span><span class="mi">SCIKIT-LEARN</span><span class="mi dot">✦</span><span class="mi">SSIS</span><span class="mi dot">✦</span><span class="mi">DAX</span><span class="mi dot">✦</span><span class="mi">DOCKER</span><span class="mi dot">✦</span><span class="mi">REACT.JS</span><span class="mi dot">✦</span><span class="mi">TENSORFLOW</span><span class="mi dot">✦</span>
+    <span class="mi">PYTHON</span><span class="mi dot">✦</span><span class="mi">AWS</span><span class="mi dot">✦</span><span class="mi">POWER BI</span><span class="mi dot">✦</span><span class="mi">SQL</span><span class="mi dot">✦</span><span class="mi">ETL PIPELINES</span><span class="mi dot">✦</span><span class="mi">MACHINE LEARNING</span><span class="mi dot">✦</span><span class="mi">POSTGRESQL</span><span class="mi dot">✦</span><span class="mi">SCIKIT-LEARN</span><span class="mi dot">✦</span><span class="mi">SSIS</span><span class="mi dot">✦</span><span class="mi">DAX</span><span class="mi dot">✦</span><span class="mi">DOCKER</span><span class="mi dot">✦</span><span class="mi">REACT.JS</span><span class="mi dot">✦</span><span class="mi">TENSORFLOW</span><span class="mi dot">✦</span>
+  </div></div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <h2 class="sh rv">Where I've<br/>Worked</h2>
+  <div class="tl">
+    <div class="ti rv">
+      <div class="tp">May 2025 – Present · Houston, TX</div>
+      <div class="tc">Harris County Attorney's Office</div>
+      <div class="tr">Software Development Intern</div>
+      <ul class="tb">
+        <li>Designed Power BI dashboards tracking legal case metrics with advanced DAX — improved reporting accuracy by <strong>40%</strong></li>
+        <li>Built automated SSIS ETL workflows processing <strong>100,000+ records daily</strong> — cut manual data entry by <strong>80%</strong></li>
+        <li>Integrated SQL queries with LawBase case management system for dynamic KPIs and drill-down reports</li>
+      </ul>
+    </div>
+    <div class="ti rv">
+      <div class="tp">Dec 2023 – Mar 2024 · Gandhinagar, India</div>
+      <div class="tc">Institute for Plasma Research</div>
+      <div class="tr">Research &amp; Development Intern</div>
+      <ul class="tb">
+        <li>Built Electronics Inventory System (Laravel + MySQL + Bootstrap) — cut tracking time by <strong>40%</strong>, improved data accuracy by <strong>25%</strong></li>
+        <li>Led 3 junior interns across 2 departments — boosted delivery speed by <strong>20%</strong></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <h2 class="sh rv">Selected<br/>Work</h2>
+  <div class="pg">
+
+    <!-- 01 KPI Dashboard — FEATURED -->
+    <div class="pc feat rv">
+      <div class="pv">
+        <svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="g1a" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#00f5a0" stop-opacity=".9"/><stop offset="1" stop-color="#00f5a0" stop-opacity=".3"/></linearGradient>
+            <linearGradient id="g1b" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#0a84ff" stop-opacity=".9"/><stop offset="1" stop-color="#0a84ff" stop-opacity=".3"/></linearGradient>
+          </defs>
+          <rect width="900" height="400" fill="#0c1510"/>
+          <line x1="0" y1="320" x2="900" y2="320" stroke="#152a1e" stroke-width="1"/>
+          <line x1="0" y1="240" x2="900" y2="240" stroke="#152a1e" stroke-width="1"/>
+          <line x1="0" y1="160" x2="900" y2="160" stroke="#152a1e" stroke-width="1"/>
+          <line x1="0" y1="80"  x2="900" y2="80"  stroke="#152a1e" stroke-width="1"/>
+          <rect x="58"  y="185" width="52" height="135" fill="url(#g1a)" rx="2"/>
+          <rect x="148" y="148" width="52" height="172" fill="url(#g1a)" rx="2"/>
+          <rect x="238" y="105" width="52" height="215" fill="url(#g1a)" rx="2"/>
+          <rect x="328" y="125" width="52" height="195" fill="url(#g1a)" rx="2"/>
+          <rect x="418" y="82"  width="52" height="238" fill="url(#g1a)" rx="2"/>
+          <rect x="508" y="62"  width="52" height="258" fill="url(#g1a)" rx="2"/>
+          <polyline points="84,185 174,148 264,105 354,122 444,82 534,62 624,68 714,52 804,40" fill="none" stroke="#0a84ff" stroke-width="2.5" stroke-linejoin="round" opacity=".85"/>
+          <circle cx="84"  cy="185" r="4" fill="#0a84ff"/>
+          <circle cx="264" cy="105" r="4" fill="#0a84ff"/>
+          <circle cx="534" cy="62"  r="5" fill="#0a84ff"/>
+          <circle cx="804" cy="40"  r="4" fill="#0a84ff"/>
+          <!-- KPI panels -->
+          <rect x="622" y="145" width="256" height="70" fill="#0d1f16" rx="3" stroke="#1a3a24" stroke-width="1"/>
+          <text x="640" y="168" font-family="monospace" font-size="9" fill="#00f5a0" opacity=".55">REPORTING ACCURACY</text>
+          <text x="640" y="200" font-family="monospace" font-size="28" font-weight="bold" fill="#00f5a0">+40%</text>
+          <rect x="622" y="228" width="256" height="70" fill="#0d1629" rx="3" stroke="#1a2a4a" stroke-width="1"/>
+          <text x="640" y="251" font-family="monospace" font-size="9" fill="#0a84ff" opacity=".55">MANUAL WORK SAVED</text>
+          <text x="640" y="283" font-family="monospace" font-size="28" font-weight="bold" fill="#0a84ff">80%</text>
+          <!-- axis -->
+          <text x="60"  y="348" font-family="monospace" font-size="10" fill="#1e3a28" opacity=".8">Jan</text>
+          <text x="150" y="348" font-family="monospace" font-size="10" fill="#1e3a28" opacity=".8">Feb</text>
+          <text x="240" y="348" font-family="monospace" font-size="10" fill="#1e3a28" opacity=".8">Mar</text>
+          <text x="330" y="348" font-family="monospace" font-size="10" fill="#1e3a28" opacity=".8">Apr</text>
+          <text x="420" y="348" font-family="monospace" font-size="10" fill="#1e3a28" opacity=".8">May</text>
+          <text x="510" y="348" font-family="monospace" font-size="10" fill="#1e3a28" opacity=".8">Jun</text>
+          <rect x="0" y="0" width="248" height="32" fill="#080808" opacity=".5"/>
+          <text x="14" y="21" font-family="monospace" font-size="10" fill="#00f5a0" opacity=".9">OPERATIONAL KPI DASHBOARD</text>
+        </svg>
+        <div class="pvo"></div>
+      </div>
+      <div class="pb">
+        <div class="pnum">01 · Featured Project</div>
+        <div class="pn">Operational KPI Dashboard — Government Legal Data</div>
+        <div class="pd">Enterprise Power BI dashboards for Harris County tracking case resolution, backlog &amp; productivity. Complex DAX measures with automated daily refresh via SQL Server Agent &amp; SSIS. Used by leadership every morning.</div>
+        <div class="tags"><span class="tag">Power BI</span><span class="tag">DAX</span><span class="tag">SQL Server</span><span class="tag">SSIS</span><span class="tag">T-SQL</span></div>
+        <div class="pf"><span class="pm">↑ 40% accuracy · ↓ 80% manual reporting</span><div class="pa">↗</div></div>
+      </div>
+    </div>
+
+    <!-- 02 Churn -->
+    <div class="pc rv">
+      <div class="pv">
+        <svg viewBox="0 0 450 252" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="450" height="252" fill="#0a100e"/>
+          <!-- confusion matrix -->
+          <rect x="38" y="42" width="88" height="78" fill="#003d2a" rx="2" stroke="#005a3c" stroke-width="1"/>
+          <rect x="136" y="42" width="88" height="78" fill="#0d1a14" rx="2" stroke="#1a2a20" stroke-width="1"/>
+          <rect x="38" y="130" width="88" height="78" fill="#0d1a14" rx="2" stroke="#1a2a20" stroke-width="1"/>
+          <rect x="136" y="130" width="88" height="78" fill="#00332a" rx="2" stroke="#004a3c" stroke-width="1"/>
+          <text x="82" y="85" text-anchor="middle" font-family="monospace" font-size="22" font-weight="bold" fill="#00f5a0">87%</text>
+          <text x="82" y="103" text-anchor="middle" font-family="monospace" font-size="9" fill="#00f5a0" opacity=".55">TRUE POS</text>
+          <text x="180" y="85" text-anchor="middle" font-family="monospace" font-size="18" font-weight="bold" fill="#333" opacity=".6">8%</text>
+          <text x="180" y="103" text-anchor="middle" font-family="monospace" font-size="9" fill="#333" opacity=".4">FALSE NEG</text>
+          <text x="82" y="172" text-anchor="middle" font-family="monospace" font-size="18" font-weight="bold" fill="#333" opacity=".6">5%</text>
+          <text x="82" y="190" text-anchor="middle" font-family="monospace" font-size="9" fill="#333" opacity=".4">FALSE POS</text>
+          <text x="180" y="172" text-anchor="middle" font-family="monospace" font-size="20" font-weight="bold" fill="#00d4ff">89%</text>
+          <text x="180" y="190" text-anchor="middle" font-family="monospace" font-size="9" fill="#00d4ff" opacity=".6">TRUE NEG</text>
+          <!-- ROC -->
+          <path d="M268,218 Q308,95 418,28" fill="none" stroke="#00f5a0" stroke-width="2" opacity=".8"/>
+          <path d="M268,218 L418,218 L418,28 Q308,95 268,218Z" fill="#00f5a0" opacity=".05"/>
+          <path d="M268,218 L418,28" fill="none" stroke="#222" stroke-width="1" stroke-dasharray="4,4"/>
+          <text x="305" y="76" font-family="monospace" font-size="9" fill="#00f5a0" opacity=".7">AUC = 0.93</text>
+          <circle cx="368" cy="72" r="4" fill="#00f5a0"/>
+          <text x="14" y="22" font-family="monospace" font-size="10" fill="#00f5a0">CHURN PREDICTION · CONFUSION MATRIX + ROC</text>
+        </svg>
+        <div class="pvo"></div>
+      </div>
+      <div class="pb">
+        <div class="pnum">02</div>
+        <div class="pn">Customer Churn Prediction</div>
+        <div class="pd">87% accuracy ML model using logistic regression &amp; random forest. EDA + hypothesis testing identified churn drivers — reduced churn risk by 20%.</div>
+        <div class="tags"><span class="tag">Python</span><span class="tag">Scikit-learn</span><span class="tag">Random Forest</span><span class="tag">EDA</span></div>
+        <div class="pf"><span class="pm">87% accuracy · AUC 0.93</span><div class="pa">↗</div></div>
+      </div>
+    </div>
+
+    <!-- 03 Sales Pipeline -->
+    <div class="pc rv">
+      <div class="pv">
+        <svg viewBox="0 0 450 252" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="450" height="252" fill="#09100e"/>
+          <!-- pipeline flow -->
+          <defs>
+            <marker id="ar1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#0a84ff"/></marker>
+            <marker id="ar2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#00f5a0"/></marker>
+            <marker id="ar3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ffd700"/></marker>
+          </defs>
+          <rect x="16" y="98" width="68" height="48" rx="2" fill="#0d1829" stroke="#1a3060" stroke-width="1.5"/>
+          <text x="50" y="118" text-anchor="middle" font-family="monospace" font-size="7" fill="#0a84ff">SOURCE</text>
+          <text x="50" y="133" text-anchor="middle" font-family="monospace" font-size="9" font-weight="bold" fill="#fff">CSV/DB</text>
+          <line x1="86" y1="122" x2="112" y2="122" stroke="#0a84ff" stroke-width="1.5" marker-end="url(#ar1)"/>
+          <rect x="114" y="82" width="80" height="80" rx="2" fill="#0d2014" stroke="#1a4028" stroke-width="1.5"/>
+          <text x="154" y="116" text-anchor="middle" font-family="monospace" font-size="7" fill="#00f5a0">SSIS</text>
+          <text x="154" y="130" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#00f5a0">TRANSFORM</text>
+          <text x="154" y="145" text-anchor="middle" font-family="monospace" font-size="7" fill="#00f5a0" opacity=".5">CLEAN · ENRICH</text>
+          <line x1="196" y1="122" x2="222" y2="122" stroke="#00f5a0" stroke-width="1.5" marker-end="url(#ar2)"/>
+          <rect x="224" y="82" width="80" height="80" rx="2" fill="#1a1200" stroke="#3a2a00" stroke-width="1.5"/>
+          <text x="264" y="116" text-anchor="middle" font-family="monospace" font-size="7" fill="#ffd700">STAR</text>
+          <text x="264" y="130" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#ffd700">SCHEMA</text>
+          <text x="264" y="145" text-anchor="middle" font-family="monospace" font-size="7" fill="#ffd700" opacity=".5">FACT · DIM</text>
+          <line x1="306" y1="122" x2="332" y2="122" stroke="#ffd700" stroke-width="1.5" marker-end="url(#ar3)"/>
+          <rect x="334" y="98" width="82" height="48" rx="2" fill="#140a20" stroke="#2a1440" stroke-width="1.5"/>
+          <text x="375" y="118" text-anchor="middle" font-family="monospace" font-size="7" fill="#d49fff">POWER BI</text>
+          <text x="375" y="133" text-anchor="middle" font-family="monospace" font-size="8" font-weight="bold" fill="#d49fff">REPORTS</text>
+          <!-- animated dots -->
+          <circle r="3" fill="#0a84ff" opacity=".9"><animateMotion dur="2s" repeatCount="indefinite" path="M86,122 L112,122"/></circle>
+          <circle r="3" fill="#00f5a0" opacity=".9"><animateMotion dur="2s" repeatCount="indefinite" begin=".6s" path="M196,122 L222,122"/></circle>
+          <circle r="3" fill="#ffd700" opacity=".9"><animateMotion dur="2s" repeatCount="indefinite" begin="1.2s" path="M306,122 L332,122"/></circle>
+          <text x="224" y="208" text-anchor="middle" font-family="monospace" font-size="11" fill="#00f5a0">↑ 35% Revenue Insights</text>
+          <text x="14" y="22" font-family="monospace" font-size="10" fill="#00f5a0">SALES ANALYTICS PIPELINE</text>
+        </svg>
+        <div class="pvo"></div>
+      </div>
+      <div class="pb">
+        <div class="pnum">03</div>
+        <div class="pn">Sales Performance Analytics Pipeline</div>
+        <div class="pd">Full ETL pipeline: raw multi-source sales → star-schema warehouse → Power BI dashboards. Leadership identified underperforming regions, boosting revenue insights by 35%.</div>
+        <div class="tags"><span class="tag">SSIS</span><span class="tag">SQL</span><span class="tag">Pandas</span><span class="tag">Star Schema</span></div>
+        <div class="pf"><span class="pm">↑ 35% revenue clarity</span><div class="pa">↗</div></div>
+      </div>
+    </div>
+
+    <!-- 04 AWS Warehouse -->
+    <div class="pc rv">
+      <div class="pv">
+        <svg viewBox="0 0 450 252" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="450" height="252" fill="#07090e"/>
+          <!-- cloud glows -->
+          <ellipse cx="225" cy="95" rx="155" ry="48" fill="none" stroke="#0a84ff" stroke-width=".8" opacity=".12"/>
+          <ellipse cx="225" cy="95" rx="100" ry="30" fill="none" stroke="#0a84ff" stroke-width=".8" opacity=".18"/>
+          <!-- S3 bucket -->
+          <ellipse cx="225" cy="76" rx="38" ry="13" fill="#0a2040" stroke="#0a84ff" stroke-width="1.5"/>
+          <rect x="187" y="76" width="76" height="38" fill="#0a2040" stroke="#0a84ff" stroke-width="1.5"/>
+          <ellipse cx="225" cy="114" rx="38" ry="13" fill="#0d2850" stroke="#0a84ff" stroke-width="1.5"/>
+          <text x="225" y="100" text-anchor="middle" font-family="monospace" font-size="9" font-weight="bold" fill="#0a84ff">S3 LAKE</text>
+          <!-- connectors -->
+          <line x1="90" y1="154" x2="187" y2="114" stroke="#0a84ff" stroke-width="1" opacity=".45" stroke-dasharray="3,3"/>
+          <line x1="360" y1="154" x2="263" y2="114" stroke="#00f5a0" stroke-width="1" opacity=".45" stroke-dasharray="3,3"/>
+          <line x1="225" y1="202" x2="225" y2="127" stroke="#ffd700" stroke-width="1" opacity=".45" stroke-dasharray="3,3"/>
+          <!-- nodes -->
+          <rect x="44"  y="148" width="92" height="44" rx="2" fill="#0d1829" stroke="#1a3060" stroke-width="1"/>
+          <text x="90" y="167" text-anchor="middle" font-family="monospace" font-size="8" fill="#0a84ff">AWS GLUE</text>
+          <text x="90" y="181" text-anchor="middle" font-family="monospace" font-size="7" fill="#4488cc" opacity=".7">ETL · CRAWL</text>
+          <rect x="314" y="148" width="92" height="44" rx="2" fill="#0d2014" stroke="#1a4028" stroke-width="1"/>
+          <text x="360" y="167" text-anchor="middle" font-family="monospace" font-size="8" fill="#00f5a0">ATHENA</text>
+          <text x="360" y="181" text-anchor="middle" font-family="monospace" font-size="7" fill="#00cc80" opacity=".7">SERVERLESS SQL</text>
+          <rect x="168" y="198" width="114" height="36" rx="2" fill="#140a20" stroke="#2a1440" stroke-width="1"/>
+          <text x="225" y="220" text-anchor="middle" font-family="monospace" font-size="8" fill="#d49fff">POWER BI REPORTS</text>
+          <!-- cost badge -->
+          <rect x="316" y="18" width="120" height="40" rx="2" fill="#001f0a" stroke="#003d18" stroke-width="1"/>
+          <text x="376" y="33" text-anchor="middle" font-family="monospace" font-size="8" fill="#00f5a0" opacity=".6">COST SAVING</text>
+          <text x="376" y="51" text-anchor="middle" font-family="monospace" font-size="16" font-weight="bold" fill="#00f5a0">↓ 30%</text>
+          <text x="14" y="22" font-family="monospace" font-size="10" fill="#0a84ff">AWS CLOUD DATA WAREHOUSE</text>
+        </svg>
+        <div class="pvo"></div>
+      </div>
+      <div class="pb">
+        <div class="pnum">04</div>
+        <div class="pn">Cloud Data Warehouse on AWS</div>
+        <div class="pd">Cloud data lake on S3 + Glue ETL + Athena serverless queries connected to Power BI. Reduced infrastructure cost by 30% compared to on-premises system.</div>
+        <div class="tags"><span class="tag">AWS S3</span><span class="tag">Glue</span><span class="tag">Athena</span><span class="tag">Power BI</span></div>
+        <div class="pf"><span class="pm">↓ 30% infrastructure cost</span><div class="pa">↗</div></div>
+      </div>
+    </div>
+
+    <!-- 05 SQL Cohort — wide -->
+    <div class="pc feat rv">
+      <div class="pv" style="aspect-ratio:21/6">
+        <svg viewBox="0 0 900 258" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="900" height="258" fill="#080c0a"/>
+          <!-- cohort heatmap -->
+          <g font-family="monospace" font-size="11">
+            <text x="68" y="48" text-anchor="middle" fill="#2a4a38" font-size="10">Cohort</text>
+            <text x="162" y="48" text-anchor="middle" fill="#00f5a0" opacity=".85">Month 0</text>
+            <text x="254" y="48" text-anchor="middle" fill="#00f5a0" opacity=".7">Month 1</text>
+            <text x="346" y="48" text-anchor="middle" fill="#00f5a0" opacity=".55">Month 2</text>
+            <text x="438" y="48" text-anchor="middle" fill="#00f5a0" opacity=".42">Month 3</text>
+            <text x="530" y="48" text-anchor="middle" fill="#00f5a0" opacity=".32">Month 4</text>
+            <text x="622" y="48" text-anchor="middle" fill="#00f5a0" opacity=".24">Month 5</text>
+            <!-- rows -->
+            <text x="68" y="83" text-anchor="middle" fill="#3a5a48" font-size="10">Jan '24</text>
+            <rect x="116" y="62" width="92" height="28" rx="1" fill="#00f5a0" opacity=".88"/><text x="162" y="80" text-anchor="middle" fill="#080808" font-weight="bold">100%</text>
+            <rect x="208" y="62" width="92" height="28" rx="1" fill="#00f5a0" opacity=".66"/><text x="254" y="80" text-anchor="middle" fill="#080808" font-weight="bold">66%</text>
+            <rect x="300" y="62" width="92" height="28" rx="1" fill="#00f5a0" opacity=".50"/><text x="346" y="80" text-anchor="middle" fill="#080808" font-weight="bold">50%</text>
+            <rect x="392" y="62" width="92" height="28" rx="1" fill="#00f5a0" opacity=".42"/><text x="438" y="80" text-anchor="middle" fill="#080808" font-weight="bold">42%</text>
+            <rect x="484" y="62" width="92" height="28" rx="1" fill="#00f5a0" opacity=".35"/><text x="530" y="80" text-anchor="middle" fill="#080808" font-weight="bold">35%</text>
+            <rect x="576" y="62" width="92" height="28" rx="1" fill="#00f5a0" opacity=".28"/><text x="622" y="80" text-anchor="middle" fill="#080808" font-weight="bold">28%</text>
+            <text x="68" y="123" text-anchor="middle" fill="#3a5a48" font-size="10">Feb '24</text>
+            <rect x="116" y="102" width="92" height="28" rx="1" fill="#00f5a0" opacity=".88"/>  <text x="162" y="120" text-anchor="middle" fill="#080808" font-weight="bold">100%</text>
+            <rect x="208" y="102" width="92" height="28" rx="1" fill="#00f5a0" opacity=".72"/> <text x="254" y="120" text-anchor="middle" fill="#080808" font-weight="bold">72%</text>
+            <rect x="300" y="102" width="92" height="28" rx="1" fill="#00f5a0" opacity=".56"/> <text x="346" y="120" text-anchor="middle" fill="#080808" font-weight="bold">56%</text>
+            <rect x="392" y="102" width="92" height="28" rx="1" fill="#00f5a0" opacity=".46"/> <text x="438" y="120" text-anchor="middle" fill="#080808" font-weight="bold">46%</text>
+            <rect x="484" y="102" width="92" height="28" rx="1" fill="#00f5a0" opacity=".39"/> <text x="530" y="120" text-anchor="middle" fill="#080808" font-weight="bold">39%</text>
+            <text x="68" y="163" text-anchor="middle" fill="#3a5a48" font-size="10">Mar '24</text>
+            <rect x="116" y="142" width="92" height="28" rx="1" fill="#00f5a0" opacity=".88"/>  <text x="162" y="160" text-anchor="middle" fill="#080808" font-weight="bold">100%</text>
+            <rect x="208" y="142" width="92" height="28" rx="1" fill="#00f5a0" opacity=".76"/> <text x="254" y="160" text-anchor="middle" fill="#080808" font-weight="bold">76%</text>
+            <rect x="300" y="142" width="92" height="28" rx="1" fill="#00f5a0" opacity=".60"/> <text x="346" y="160" text-anchor="middle" fill="#080808" font-weight="bold">60%</text>
+            <rect x="392" y="142" width="92" height="28" rx="1" fill="#00f5a0" opacity=".50"/> <text x="438" y="160" text-anchor="middle" fill="#080808" font-weight="bold">50%</text>
+          </g>
+          <!-- metrics -->
+          <rect x="700" y="58" width="184" height="52" rx="2" fill="#001f0a" stroke="#003d18" stroke-width="1"/>
+          <text x="792" y="76" text-anchor="middle" font-family="monospace" font-size="9" fill="#00f5a0" opacity=".6">QUERY SPEED BOOST</text>
+          <text x="792" y="100" text-anchor="middle" font-family="monospace" font-size="24" font-weight="bold" fill="#00f5a0">↓ 45%</text>
+          <rect x="700" y="124" width="184" height="52" rx="2" fill="#001428" stroke="#002850" stroke-width="1"/>
+          <text x="792" y="142" text-anchor="middle" font-family="monospace" font-size="9" fill="#0a84ff" opacity=".6">SEGMENT ACCURACY</text>
+          <text x="792" y="166" text-anchor="middle" font-family="monospace" font-size="24" font-weight="bold" fill="#0a84ff">↑ 28%</text>
+          <text x="14" y="22" font-family="monospace" font-size="10" fill="#00f5a0">CUSTOMER COHORT RETENTION ANALYSIS</text>
+        </svg>
+        <div class="pvo"></div>
+      </div>
+      <div class="pb">
+        <div class="pnum">05 · Advanced SQL</div>
+        <div class="pn">Customer Behavior Analysis — Cohort Retention</div>
+        <div class="pd">CTEs, RANK(), LAG(), rolling averages to compute cohort-based retention metrics across transaction data. Query optimization reduced execution time 45% and transformed segmentation strategy.</div>
+        <div class="tags"><span class="tag">PostgreSQL</span><span class="tag">CTEs</span><span class="tag">Window Functions</span><span class="tag">Cohort Analysis</span></div>
+        <div class="pf"><span class="pm">↓ 45% query time · ↑ 28% segmentation accuracy</span><div class="pa">↗</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <h2 class="sh rv">Tools &amp;<br/>Stack</h2>
+  <div class="skl">
+    <div class="skd rv">
+      <p>I don't collect tools — I deploy them with intention. Each skill here maps to production work with measurable outcomes.</p>
+      <p style="margin-top:18px;font-size:14px;color:var(--text3)">Currently sharpening:<br/>dbt · Apache Spark · Kafka</p>
+    </div>
+    <div class="skr" id="skr">
+      <div class="skrow" data-pct="90"><span class="skno">01</span><span class="skna">Python, C++, Java, JavaScript</span><span class="skpct">90%</span><div class="skbw"><div class="skb"></div></div></div>
+      <div class="skrow" data-pct="85"><span class="skno">02</span><span class="skna">AWS — EC2, S3, Lambda, Glue, Athena, SageMaker</span><span class="skpct">85%</span><div class="skbw"><div class="skb"></div></div></div>
+      <div class="skrow" data-pct="92"><span class="skno">03</span><span class="skna">Power BI — DAX, Dashboards, KPIs</span><span class="skpct">92%</span><div class="skbw"><div class="skb"></div></div></div>
+      <div class="skrow" data-pct="95"><span class="skno">04</span><span class="skna">SQL — PostgreSQL, MySQL, SQL Server, T-SQL</span><span class="skpct">95%</span><div class="skbw"><div class="skb"></div></div></div>
+      <div class="skrow" data-pct="88"><span class="skno">05</span><span class="skna">ETL / SSIS / Data Pipelines</span><span class="skpct">88%</span><div class="skbw"><div class="skb"></div></div></div>
+      <div class="skrow" data-pct="75"><span class="skno">06</span><span class="skna">React.js, Django, Laravel</span><span class="skpct">75%</span><div class="skbw"><div class="skb"></div></div></div>
+      <div class="skrow" data-pct="80"><span class="skno">07</span><span class="skna">Machine Learning — Scikit-learn, TensorFlow, Keras</span><span class="skpct">80%</span><div class="skbw"><div class="skb"></div></div></div>
+      <div class="skrow" data-pct="78"><span class="skno">08</span><span class="skna">Docker, Git, Grafana, Cloudflare R2</span><span class="skpct">78%</span><div class="skbw"><div class="skb"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <h2 class="sh rv">Education</h2>
+  <div class="eg">
+    <div class="ec rv"><div class="en">01</div><div class="es">University of Houston</div><div class="ed">MS · Computer Science</div><div class="em">Aug 2024 – Present · Houston, TX</div><div class="eg2">GPA 3.75 / 4.0</div><div class="ec2">Data Visualization · Cloud Computing · Data Engineering · Data Mining · AI</div></div>
+    <div class="ec rv d1"><div class="en">02</div><div class="es">Dharmsinh Desai University</div><div class="ed">BTech · Information Technology</div><div class="em">Aug 2020 – May 2024 · Nadiad, India</div><div class="eg2">GPA 3.8 / 4.0</div><div class="ec2">Data Structures · OOP · Web Technologies · Networks · OS · SDLC</div></div>
+  </div>
+</section>
+
+<!-- WHY ME -->
+<section id="pitch" class="fb">
+  <div class="pi si">
+    <p class="peyeb rv">For Recruiters</p>
+    <h2 class="sh rv" style="max-width:680px">Why Vasu<br/>stands out</h2>
+    <div class="pitchg">
+      <div class="pcard rv"><div class="pico">🔗</div><div class="pti">End-to-End Ownership</div><div class="pbo">I own the <span class="pac">full data chain</span> — ingestion, transformation, modeling, dashboards. No handoffs, no gaps. Executives at Harris County use what I built every single morning.</div></div>
+      <div class="pcard rv d1"><div class="pico">📊</div><div class="pti">Impact Over Activity</div><div class="pbo">Every project has a number attached: <span class="pac">40% accuracy improvement</span>, <span class="pac">80% reduction in manual work</span>, <span class="pac">87% model accuracy</span>. I track outcomes, not just deliverables.</div></div>
+      <div class="pcard rv"><div class="pico">☁️</div><div class="pti">Cloud-Native Mindset</div><div class="pbo">AWS-first thinking baked in. Designed a <span class="pac">cloud data lake on S3 + Glue + Athena</span> that cut infrastructure costs by 30%. I build systems that scale, not just work today.</div></div>
+      <div class="pcard rv d1"><div class="pico">🎓</div><div class="pti">Sharp Academically Too</div><div class="pbo">GPA 3.75 at UH in MS Computer Science — covering <span class="pac">Cloud, Data Engineering, AI, Data Mining</span> — while simultaneously delivering production work as an intern. Both, not either.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="cey rv">Let's Work Together</p>
+  <h2 class="ch rv">Let's<br/>Build<br/><span class="acc">Together</span></h2>
+  <a href="mailto:vasugoti15@gmail.com" class="cem rv" aria-label="Email Vasu Goti">
+    <span>vasugoti15@gmail.com</span><span class="arr">→</span>
+  </a>
+  <div class="sr rv">
+    <a href="https://linkedin.com/in/vasugoti" target="_blank" class="sla">LinkedIn</a>
+    <span class="ssep">·</span>
+    <a href="#" class="sla">GitHub</a>
+    <span class="ssep">·</span>
+    <a href="tel:+18327036070" class="sla">+1 (832) 703 6070</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p class="fc">© 2026 Vasu Hareshbhai Goti · Houston, TX</p>
+  <div class="fls">
+    <a href="https://linkedin.com/in/vasugoti" target="_blank">LinkedIn</a>
+    <a href="#">GitHub</a>
+    <a href="mailto:vasugoti15@gmail.com">Email</a>
+  </div>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* CURSOR */
+const cur=document.getElementById('cursor'),cring=document.getElementById('cring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+(function tick(){rx+=(mx-rx)*.18;ry+=(my-ry)*.18;
+  gsap.set(cur,{x:mx,y:my});gsap.set(cring,{x:rx,y:ry});
+  requestAnimationFrame(tick);
+})();
+document.querySelectorAll('a,button,.pc,.pcard,.ec,.ti,.chip').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.classList.add('big');cring.classList.add('big')});
+  el.addEventListener('mouseleave',()=>{cur.classList.remove('big');cring.classList.remove('big')});
+});
+document.querySelector('.cem').addEventListener('mouseenter',()=>{cur.classList.add('blue');cring.classList.add('blue')});
+document.querySelector('.cem').addEventListener('mouseleave',()=>{cur.classList.remove('blue');cring.classList.remove('blue')});
+
+/* NAV SCROLL */
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',scrollY>60);
+  document.getElementById('sbadge').style.opacity=scrollY>80?'0':'1';
+});
+
+/* THEME */
+const html=document.documentElement;
+const togBtn=document.getElementById('tog');
+const togIcon=document.getElementById('togIcon');
+togBtn.addEventListener('click',()=>{
+  const dark=html.dataset.theme==='dark';
+  html.dataset.theme=dark?'light':'dark';
+  togIcon.textContent=dark?'🌙':'☀️';
+  gsap.to(togBtn,{rotation:'+=180',duration:.5,ease:'back.out(1.7)'});
+});
+
+/* MOBILE MENU */
+document.getElementById('ham').addEventListener('click',()=>document.getElementById('mob').classList.add('open'));
+document.getElementById('mbc').addEventListener('click',cm);
+function cm(){document.getElementById('mob').classList.remove('open')}
+
+/* SMOOTH SCROLL */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const id=a.getAttribute('href');if(id==='#')return;
+    const el=document.querySelector(id);
+    if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth'})}
+  });
+});
+
+/* HERO */
+const tl=gsap.timeline({delay:.15});
+tl.to('.hkick',{opacity:1,duration:.6,ease:'power2.out'});
+document.querySelectorAll('.hl span').forEach((el,i)=>{
+  tl.to(el,{y:0,opacity:1,duration:.95,ease:'expo.out'},0.12+i*.11);
+});
+tl.to('.hsub',{opacity:1,y:0,duration:.8,ease:'expo.out'},'-=.5');
+tl.to('.hcta',{opacity:1,y:0,duration:.8,ease:'expo.out'},'-=.6');
+tl.to('.hloc',{opacity:1,y:0,duration:.6,ease:'power2.out'},'-=.5');
+tl.to('.scue',{opacity:1,y:0,duration:.6,ease:'power2.out'},'-=.5');
+
+/* INTERSECTION OBSERVER REVEALS */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target)}});
+},{threshold:.1});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* COUNTER */
+const co=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const el=e.target,target=parseInt(el.dataset.count),sfx=el.dataset.sfx||'';
+      let v=0;const step=target/55;
+      const t=setInterval(()=>{v+=step;if(v>=target){v=target;clearInterval(t)}
+        el.textContent=Math.floor(v)+sfx;},16);
+      co.unobserve(el);
+    }
+  });
+},{threshold:.6});
+document.querySelectorAll('.sn[data-count]').forEach(el=>co.observe(el));
+
+/* SKILL BARS */
+const sko=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      document.querySelectorAll('.skrow').forEach((row,i)=>{
+        setTimeout(()=>{
+          row.classList.add('vis');
+          const b=row.querySelector('.skb');
+          if(b)b.style.width=row.dataset.pct+'%';
+        },i*85);
+      });
+      sko.disconnect();
+    }
+  });
+},{threshold:.1});
+const skr=document.getElementById('skr');
+if(skr)sko.observe(skr);
+</script>
+</body>
+</html>
